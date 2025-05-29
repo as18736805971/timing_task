@@ -377,7 +377,7 @@ class YeziPlatform:
         params = {
             'token': self.token,
             'project_id': self.project_id,
-            'scope': "130"
+            # 'scope': "171"
             # 'scope_black':"192"
             # 'scope': "130,190,136,131"
         }
@@ -560,6 +560,39 @@ def main():
                 logger.error("获取手机号失败")
                 time.sleep(3)
                 continue
+
+            # 开始号段过滤功能
+            # 定义需要过滤的号段列表
+            filtered_prefixes = ['192', '165', '167']  # 需要过滤的号段
+            should_filter = False
+
+            # 检查手机号前3位是否在过滤列表中
+            for prefix in filtered_prefixes:
+                if phone_number.startswith(prefix):
+                    logger.warning(f"手机号 {phone_number} 号段为{prefix}，需要过滤，释放并重新获取")
+                    should_filter = True
+                    break
+
+            if should_filter:
+                yezi.free_mobile(phone_number)
+                time.sleep(3)
+                continue
+
+            # 过滤掉特定前缀的手机号
+            filtered_prefixes = ['1718531', '1719']  # 需要过滤的前缀列表 18120
+            should_filter = False
+
+            for prefix in filtered_prefixes:
+                if phone_number.startswith(prefix):
+                    logger.warning(f"手机号 {phone_number} 前缀为{prefix}，需要过滤，释放并重新获取")
+                    should_filter = True
+                    break
+
+            if should_filter:
+                yezi.free_mobile(phone_number)
+                time.sleep(3)
+                continue
+            # 结束号段过滤
 
             logger.info(f"获取到手机号: {phone_number}")
 
