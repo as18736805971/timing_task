@@ -1,13 +1,15 @@
 
 const $ = new Env('福田e家');
-const FTEJ = ($.isNode() ? process.env.ftbfb : $.getdata("ftbfb")) || '';
-const FTEJ_PK = ($.isNode() ? process.env.FTEJ_PK : $.getdata("FTEJ_PK")) || '1'; //皮卡生活签到 开启=1，关闭=0
-const FTEJ_Lottery = ($.isNode() ? process.env.FTEJ_Lottery : $.getdata("FTEJ_Lottery")) || '0'; //积分转盘抽奖 开启=1，关闭=0
-const FTEJ_SpringSign = ($.isNode() ? process.env.FTEJ_SpringSign : $.getdata("FTEJ_SpringSign")) || '0'; //春日活动
+// const FTEJ = ($.isNode() ? process.env.ftbfb : $.getdata("ftbfb")) || '';
+const FTEJ = '18155186134#xixi187615&19056878758#xixi187615'; // 示例
+// const FTEJ = '18736805971#18736805971&19715535901#19715535901&15138169586#15138169586&19838588727#19838588727&18236353197#18236353197&15665083891#15665083891&17716348018#17716348018&17666130760#17666130760&15036670450#15036670450&18237072736#18237072736&18580431056#18580431056&19120110652#19120110652&13148982885#13148982885';
+const FTEJ_PK = '0'; //皮卡生活签到 开启=1，关闭=0
+const FTEJ_Lottery = '1'; //积分转盘抽奖 开启=1，关闭=0
+const FTEJ_SpringSign = '0'; //春日活动
 let notice = '';
 
 async function main() {
-    
+
     if (!FTEJ) {
         console.log("未配置账号信息，请添加环境变量");
         return;
@@ -47,13 +49,13 @@ const randomDelay = (min, max) => {
 
 async function retryTask(taskFn, maxRetries = 3, initialDelay = 1000) {
     let delay = initialDelay;
-    
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             return await taskFn();
         } catch (error) {
             if (attempt === maxRetries) throw error;
-            
+
             console.log(`✘第 ${attempt} 次尝试失败: ${error.message}${delay/1000}秒后重试`);
             await new Promise(resolve => setTimeout(resolve, delay));
             delay *= 2;
@@ -136,7 +138,7 @@ async function springDayLottery(memberID, memberComplexCode, phone, ticketValue,
 
         for (let i = 1; i <= 5; i++) {
             await randomDelay(5, 10);
-    
+
             const lotteryResponse = await request('/shareCars/c250401/luckyDraw.action', {
                 method: 'POST',
                 headers: {
@@ -148,10 +150,10 @@ async function springDayLottery(memberID, memberComplexCode, phone, ticketValue,
                 },
                 body: `encryptMemberId=${memberComplexCode}&activityNum=250401`
             });
-    
+
             const lotteryMsg = lotteryResponse.data?.msg || '未知错误';
             console.log(`[${index}]春日第${i}抽: ${lotteryMsg}`);
-    
+
             if (lotteryMsg.includes('没有抽奖次数')) {
                 console.log(`[${index}]暂无抽奖次数，跳过`);
                 break;
@@ -192,7 +194,7 @@ async function springDaySign(memberID, memberComplexCode, phone, ticketValue, in
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                 'X-Requested-With': 'XMLHttpRequest',
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 14; Mobile)', 
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 14; Mobile)',
                 'Cookie': `SESSION=${session}; FOTONTGT=${ticketValue}; HWWAFSESID=${hwwafsesid}; HWWAFSESTIME=${hwwafsestime}`
             },
             body: `encryptMemberId=${memberComplexCode}`
@@ -255,13 +257,13 @@ async function processPikaLife(phone, password, index) {
             },
             pkToken
         );
-        
+
         if (!pkSign.data.integral) {
             throw new Error(pkSign.data.msg || "皮卡生活签到失败");
         }
-        
+
         console.log(`[${index}]皮卡生活签到成功，获得${pkSign.data.integral}积分`);
-        
+
 
         return `[${index}]皮卡生活签到完成`;
     } catch (error) {
@@ -388,7 +390,7 @@ async function processAccount(account, index) {
 
         console.log(`[${index}]${maskedPhone} 处理中`);
         console.log('————————————');
-        
+
         const login = await retryTask(async () => {
             return await loginPost('/ehomes-new/homeManager/getLoginMember', {
                 password,
@@ -415,7 +417,7 @@ async function processAccount(account, index) {
 
         // 调用打开APP函数
         await corsToActivity(memberID, uid, phone, nickName, index);
-        
+
         // 调用保存友盟设备信息函数
         await saveUserDeviceInfo(memberID, uid, phone, index);
 
@@ -423,26 +425,26 @@ async function processAccount(account, index) {
         let taskList = await retryTask(async () => {
             return await commonPost('/ehomes-new/homeManager/api/Member/getTaskList', {
                 "memberId": memberID,
-                "userId": uid, 
-                "userType": "61", 
-                "uid": uid, 
-                "mobile": phone, 
-                "tel": phone, 
-                "phone": phone, 
-                "brandName": "", 
-                "seriesName": "", 
-                "token": "ebf76685e48d4e14a9de6fccc76483e3", 
-                "safeEnc": Date.now() - 20220000, 
+                "userId": uid,
+                "userType": "61",
+                "uid": uid,
+                "mobile": phone,
+                "tel": phone,
+                "phone": phone,
+                "brandName": "",
+                "seriesName": "",
+                "token": "ebf76685e48d4e14a9de6fccc76483e3",
+                "safeEnc": Date.now() - 20220000,
                 "businessId": 1
             });
         });
 
         for (const task of taskList.data) {
             console.log(`[${index}]任务：${task.ruleName}`);
-            
+
             if (task.isComplete === "1") {
                 console.log(`[${index}]任务已完成，跳过`);
-                continue; 
+                continue;
             }
 
             if (task.ruleName === '签到') {
@@ -502,7 +504,7 @@ async function processAccount(account, index) {
                 });
 
                 const targetMemberId = posts.data[Math.floor(Math.random() * posts.data.length)].memberId;
-                
+
                 // 关注
                 await commonPost('/ehomes-new/ehomesCommunity/api/post/follow2nd', {
                     memberId: memberComplexCode,
@@ -562,7 +564,8 @@ async function processAccount(account, index) {
                 });
 
                 const topicId = topics.data.top[Math.floor(Math.random() * topics.data.top.length)].topicId;
-                const text = await textGet() || "生活就像一杯茶，不会苦一辈子，但要学会等待她的甘甜。";
+                let content = await textGet() || "生活就像一杯茶，不会苦一辈子，但要学会等待她的甘甜。";
+                let text = content.data.text
 
                 await randomDelay(45, 90);
                 await commonPost('/ehomes-new/ehomesCommunity/api/post/addJson2nd', {
@@ -602,12 +605,12 @@ async function processAccount(account, index) {
             // await springDaySign(memberID, memberComplexCode, phone, login.data.ticketValue, index);
         // } else {
             // console.log(`[${index}]春日活动已关闭，跳过`);
-        // }        
+        // }
 
         // 春日抽奖
         if (FTEJ_SpringSign === '1') {
             await springDayLottery(memberID, memberComplexCode, phone, login.data.ticketValue, index);
-        } else {    
+        } else {
             //console.log(`[${index}] 春日抽奖已关闭，跳过`);
         }
 
@@ -798,7 +801,7 @@ async function pkPost(url, body, token) {
 async function textGet() {
     return new Promise(resolve => {
         const options = {
-            url: `http://api.btstu.cn/yan/api.php`,
+            url: `https://www.yuanxiapi.cn/api/?id=18&key=1018_b75d9bab53615ecc184c2988fc51da24`,
             headers: {}
         };
         $.get(options, async (err, resp, data) => {
@@ -809,7 +812,7 @@ async function textGet() {
                     return resolve('如果觉得没有朋友，就去找喜欢的人表白，对方会提出和你做朋友的。');
                 } else {
                     await $.wait(2000);
-                    resolve(data);
+                    resolve(JSON.parse(data))
                 }
             } catch (e) {
                 $.logErr(e, resp);

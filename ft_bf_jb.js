@@ -1,9 +1,10 @@
 const $ = new Env('福田e家');
 // const FTEJ = ($.isNode() ? process.env.ftbfb : $.getdata("ftbfb")) || '';
-// const FTEJ = '17333152443#xixi187&19305654857#xixi187615'; // 示例
-const FTEJ = '18736805971#18736805971&19715535901#19715535901&15138169586#15138169586&19838588727#19838588727&18236353197#18236353197&15665083891#15665083891&17716348018#17716348018&17666130760#17666130760&15036670450#15036670450&18237072736#18237072736&18580431056#18580431056&19120110652#19120110652&13148982885#13148982885';
-const FTEJ_PK = '1'; //皮卡生活签到 开启=1，关闭=0
-const FTEJ_Lottery = '0'; //积分转盘抽奖 开启=1，关闭=0
+const FTEJ = '18155186134#xixi187615&19056878758#xixi187615'; // 示例
+// const FTEJ = '18736805971#18736805971&19715535901#19715535901&15138169586#15138169586&19838588727#19838588727&18236353197#18236353197&15665083891#15665083891&17716348018#17716348018&17666130760#17666130760&15036670450#15036670450&18237072736#18237072736&18580431056#18580431056&19120110652#19120110652&13148982885#13148982885';
+const FTEJ_PK = '0'; //皮卡生活签到 开启=1，关闭=0
+const FTEJ_RW = '0'; //任务签到 开启=1，关闭=0
+const FTEJ_Lottery = '1'; //积分转盘抽奖 开启=1，关闭=0
 const FTEJ_SpringSign = '0'; //春日活动
 let notice = '';
 
@@ -420,36 +421,136 @@ async function processAccount(account, index) {
         await saveUserDeviceInfo(memberID, uid, phone, index);
 
         // 获取任务列表
-        let taskList = await retryTask(async () => {
-            return await commonPost('/ehomes-new/homeManager/api/Member/getTaskList', {
-                "memberId": memberID,
-                "userId": uid,
-                "userType": "61",
-                "uid": uid,
-                "mobile": phone,
-                "tel": phone,
-                "phone": phone,
-                "brandName": "",
-                "seriesName": "",
-                "token": "ebf76685e48d4e14a9de6fccc76483e3",
-                "safeEnc": Date.now() - 20220000,
-                "businessId": 1
+        if (FTEJ_RW === '1') {
+
+            let taskList = await retryTask(async () => {
+                return await commonPost('/ehomes-new/homeManager/api/Member/getTaskList', {
+                    "memberId": memberID,
+                    "userId": uid,
+                    "userType": "61",
+                    "uid": uid,
+                    "mobile": phone,
+                    "tel": phone,
+                    "phone": phone,
+                    "brandName": "",
+                    "seriesName": "",
+                    "token": "ebf76685e48d4e14a9de6fccc76483e3",
+                    "safeEnc": Date.now() - 20220000,
+                    "businessId": 1
+                });
             });
-        });
 
-        for (const task of taskList.data) {
-            console.log(`[${index}]任务：${task.ruleName}`);
+            for (const task of taskList.data) {
+                console.log(`[${index}]任务：${task.ruleName}`);
 
-            if (task.isComplete === "1") {
-                console.log(`[${index}]任务已完成，跳过`);
-                continue;
-            }
+                if (task.isComplete === "1") {
+                    console.log(`[${index}]任务已完成，跳过`);
+                    continue;
+                }
 
-            if (task.ruleName === '签到') {
-                if (login.data.signIn === "未签到") {
+                if (task.ruleName === '签到') {
+                    if (login.data.signIn === "未签到") {
+                        await randomDelay(45, 90);
+                        const sign = await commonPost('/ehomes-new/homeManager/api/bonus/signActivity2nd', {
+                            memberId: memberComplexCode,
+                            userId: uid,
+                            userType: "61",
+                            uid,
+                            mobile: phone,
+                            tel: phone,
+                            phone,
+                            brandName: "",
+                            seriesName: "",
+                            token: "ebf76685e48d4e14a9de6fccc76483e3",
+                            safeEnc: Date.now() - 2022020270,
+                            businessId: 1
+                        });
+                        console.log(`[${index}]福田e家签到结果: ${sign.data.integral ? `获得${sign.data.integral}积分` : sign.msg}`);
+                    } else {
+                        console.log(`[${index}]当前签到状态: ${login.data.signIn}，跳过签到操作`);
+                    }
+                }
+
+                if (task.ruleName === '保客分享') {
                     await randomDelay(45, 90);
-                    const sign = await commonPost('/ehomes-new/homeManager/api/bonus/signActivity2nd', {
+                    const share = await loginPost('/ehomes-new/homeManager/api/bonus/addIntegralForShare', {
+                        safeEnc: Date.now() - 2022020270,
+                        activity: "",
+                        tel: phone,
+                        id: "33",
+                        source: "APP",
+                        memberId: memberComplexCode
+                    });
+                    console.log(`[${index}]分享任务结果: ${share.data?.integral ? `获得${share.data.integral}积分` : share.msg}`);
+                }
+
+                if (task.ruleName === '关注') {
+                    await randomDelay(45, 90);
+                    const posts = await commonPost('/ehomes-new/ehomesCommunity/api/post/recommendPostList', {
+                        memberId: memberID,
+                        userId: uid,
+                        userType: "61",
+                        uid,
+                        mobile: phone,
+                        tel: phone,
+                        phone,
+                        brandName: "",
+                        seriesName: "",
+                        token: "ebf76685e48d4e14a9de6fccc76483e3",
+                        safeEnc: Date.now() - 2022020270,
+                        businessId: 1,
+                        position: "1",
+                        pageNumber: "1",
+                        pageSize: 9
+                    });
+
+                    const targetMemberId = posts.data[Math.floor(Math.random() * posts.data.length)].memberId;
+
+                    // 关注
+                    await commonPost('/ehomes-new/ehomesCommunity/api/post/follow2nd', {
                         memberId: memberComplexCode,
+                        userId: uid,
+                        userType: "61",
+                        uid,
+                        mobile: phone,
+                        tel: phone,
+                        phone,
+                        brandName: "",
+                        seriesName: "",
+                        token: "ebf76685e48d4e14a9de6fccc76483e3",
+                        safeEnc: Date.now() - 2022020270,
+                        businessId: 1,
+                        behavior: "1",
+                        memberIdeds: targetMemberId,
+                        navyId: "null"
+                    });
+                    console.log(`[${index}]关注成功`);
+
+                    // 延时后取关
+                    await randomDelay(1, 3);
+                    await commonPost('/ehomes-new/ehomesCommunity/api/post/follow2nd', {
+                        memberId: memberComplexCode,
+                        userId: uid,
+                        userType: "61",
+                        uid,
+                        mobile: phone,
+                        tel: phone,
+                        phone,
+                        brandName: "",
+                        seriesName: "",
+                        token: "ebf76685e48d4e14a9de6fccc76483e3",
+                        safeEnc: Date.now() - 2022020270,
+                        businessId: 1,
+                        behavior: "2",
+                        memberIdeds: targetMemberId,
+                        navyId: "null"
+                    });
+                    console.log(`[${index}]取关成功`);
+                }
+
+                if (task.ruleName === '发帖') {
+                    const topics = await loginPost('/ehomes-new/ehomesCommunity/api/post/topicList', {
+                        memberId: memberID,
                         userId: uid,
                         userType: "61",
                         uid,
@@ -462,131 +563,36 @@ async function processAccount(account, index) {
                         safeEnc: Date.now() - 2022020270,
                         businessId: 1
                     });
-                    console.log(`[${index}]福田e家签到结果: ${sign.data.integral ? `获得${sign.data.integral}积分` : sign.msg}`);
-                } else {
-                    console.log(`[${index}]当前签到状态: ${login.data.signIn}，跳过签到操作`);
+
+                    const topicId = topics.data.top[Math.floor(Math.random() * topics.data.top.length)].topicId;
+                    let content = await textGet() || "生活就像一杯茶，不会苦一辈子，但要学会等待她的甘甜。";
+                    let text = content.data.text
+                    await randomDelay(45, 90);
+                    await commonPost('/ehomes-new/ehomesCommunity/api/post/addJson2nd', {
+                        memberId: memberComplexCode,
+                        userId: uid,
+                        userType: "61",
+                        uid,
+                        mobile: phone,
+                        tel: phone,
+                        phone,
+                        brandName: "",
+                        seriesName: "",
+                        token: "ebf76685e48d4e14a9de6fccc76483e3",
+                        safeEnc: Date.now() - 2022020270,
+                        businessId: 1,
+                        content: text,
+                        postType: 1,
+                        topicIdList: [topicId],
+                        uploadFlag: 3,
+                        title: "",
+                        urlList: []
+                    });
+                    console.log(`[${index}]发帖成功`);
                 }
             }
-
-            if (task.ruleName === '保客分享') {
-                await randomDelay(45, 90);
-                const share = await loginPost('/ehomes-new/homeManager/api/bonus/addIntegralForShare', {
-                    safeEnc: Date.now() - 2022020270,
-                    activity: "",
-                    tel: phone,
-                    id: "33",
-                    source: "APP",
-                    memberId: memberComplexCode
-                });
-                console.log(`[${index}]分享任务结果: ${share.data?.integral ? `获得${share.data.integral}积分` : share.msg}`);
-            }
-
-            if (task.ruleName === '关注') {
-                await randomDelay(45, 90);
-                const posts = await commonPost('/ehomes-new/ehomesCommunity/api/post/recommendPostList', {
-                    memberId: memberID,
-                    userId: uid,
-                    userType: "61",
-                    uid,
-                    mobile: phone,
-                    tel: phone,
-                    phone,
-                    brandName: "",
-                    seriesName: "",
-                    token: "ebf76685e48d4e14a9de6fccc76483e3",
-                    safeEnc: Date.now() - 2022020270,
-                    businessId: 1,
-                    position: "1",
-                    pageNumber: "1",
-                    pageSize: 9
-                });
-
-                const targetMemberId = posts.data[Math.floor(Math.random() * posts.data.length)].memberId;
-
-                // 关注
-                await commonPost('/ehomes-new/ehomesCommunity/api/post/follow2nd', {
-                    memberId: memberComplexCode,
-                    userId: uid,
-                    userType: "61",
-                    uid,
-                    mobile: phone,
-                    tel: phone,
-                    phone,
-                    brandName: "",
-                    seriesName: "",
-                    token: "ebf76685e48d4e14a9de6fccc76483e3",
-                    safeEnc: Date.now() - 2022020270,
-                    businessId: 1,
-                    behavior: "1",
-                    memberIdeds: targetMemberId,
-                    navyId: "null"
-                });
-                console.log(`[${index}]关注成功`);
-
-                // 延时后取关
-                await randomDelay(1, 3);
-                await commonPost('/ehomes-new/ehomesCommunity/api/post/follow2nd', {
-                    memberId: memberComplexCode,
-                    userId: uid,
-                    userType: "61",
-                    uid,
-                    mobile: phone,
-                    tel: phone,
-                    phone,
-                    brandName: "",
-                    seriesName: "",
-                    token: "ebf76685e48d4e14a9de6fccc76483e3",
-                    safeEnc: Date.now() - 2022020270,
-                    businessId: 1,
-                    behavior: "2",
-                    memberIdeds: targetMemberId,
-                    navyId: "null"
-                });
-                console.log(`[${index}]取关成功`);
-            }
-
-            if (task.ruleName === '发帖') {
-                const topics = await loginPost('/ehomes-new/ehomesCommunity/api/post/topicList', {
-                    memberId: memberID,
-                    userId: uid,
-                    userType: "61",
-                    uid,
-                    mobile: phone,
-                    tel: phone,
-                    phone,
-                    brandName: "",
-                    seriesName: "",
-                    token: "ebf76685e48d4e14a9de6fccc76483e3",
-                    safeEnc: Date.now() - 2022020270,
-                    businessId: 1
-                });
-
-                const topicId = topics.data.top[Math.floor(Math.random() * topics.data.top.length)].topicId;
-                let content = await textGet() || "生活就像一杯茶，不会苦一辈子，但要学会等待她的甘甜。";
-                let text = content.data.text
-                await randomDelay(45, 90);
-                await commonPost('/ehomes-new/ehomesCommunity/api/post/addJson2nd', {
-                    memberId: memberComplexCode,
-                    userId: uid,
-                    userType: "61",
-                    uid,
-                    mobile: phone,
-                    tel: phone,
-                    phone,
-                    brandName: "",
-                    seriesName: "",
-                    token: "ebf76685e48d4e14a9de6fccc76483e3",
-                    safeEnc: Date.now() - 2022020270,
-                    businessId: 1,
-                    content: text,
-                    postType: 1,
-                    topicIdList: [topicId],
-                    uploadFlag: 3,
-                    title: "",
-                    urlList: []
-                });
-                console.log(`[${index}]发帖成功`);
-            }
+        } else {
+            // console.log(`[${index}]正常签到已关闭，跳过`);
         }
 
         // 调用皮卡生活签到函数
