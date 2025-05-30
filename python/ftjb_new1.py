@@ -616,7 +616,7 @@ def main():
                     # 构建修改密码请求
                     update_data = {
                         "memberId": "",
-                        "password": "zhao12345678",#要修改的手机号
+                        "password": "xixi187615",#要修改的手机号
                         "smsCode": sms_result.get("verification_code"),
                         "ip": "127.0.0.1",
                         "tel": phone_number
@@ -732,7 +732,7 @@ def main():
 
         # 为每个成功的手机号查询积分
         for phone in successful_phones:
-            password = "zhao12345678"  # 使用修改后的密码
+            password = "xixi187615"  # 使用修改后的密码
             login_result = login(phone, password)
 
             if login_result.token:

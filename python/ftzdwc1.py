@@ -1580,7 +1580,7 @@ def main():
                     # 构建修改密码请求
                     update_data = {
                         "memberId": "",
-                        "password": "zhao12345678",#要修改的手机号
+                        "password": "xixi187615",#要修改的手机号
                         "smsCode": sms_result.get("verification_code"),
                         "ip": "127.0.0.1",
                         "tel": phone_number
