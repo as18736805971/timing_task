@@ -1,15 +1,12 @@
 const $ = new Env('福田e家');
-// const FTEJ = ($.isNode() ? process.env.ftbfb : $.getdata("ftbfb")) || '';
-const FTEJ = '18155186134#xixi187615&19056878758#xixi187615'; // 示例
-// const FTEJ = '18736805971#18736805971&19715535901#19715535901&15138169586#15138169586&19838588727#19838588727&18236353197#18236353197&15665083891#15665083891&17716348018#17716348018&17666130760#17666130760&15036670450#15036670450&18237072736#18237072736&18580431056#18580431056&19120110652#19120110652&13148982885#13148982885';
-const FTEJ_PK = '1'; //皮卡生活签到 开启=1，关闭=0
-const FTEJ_RW = '1'; //任务签到 开启=1，关闭=0
-const FTEJ_Lottery = '0'; //积分转盘抽奖 开启=1，关闭=0
-const FTEJ_SpringSign = '0'; //春日活动
+const FTEJ = '17354127873#stars123456'; // #隔开密码 &隔开账号
+const FTEJ_PK = '0'; // 皮卡生活签到 开启=1，关闭=0
+const FTEJ_RW = '0'; // 任务签到 开启=1，关闭=0
+const FTEJ_Lottery = '1'; // 积分转盘抽奖 开启=1，关闭=0
 let notice = '';
 
+// 初始执行方法
 async function main() {
-
     if (!FTEJ) {
         console.log("未配置账号信息，请添加环境变量");
         return;
@@ -41,11 +38,13 @@ async function main() {
     .catch((e) => $.logErr(e))
     .finally(() => $.done());
 
+// 随机添加延迟
 const randomDelay = (min, max) => {
     const delay = Math.floor(Math.random() * (max - min + 1)) + min;
     return new Promise(resolve => setTimeout(resolve, delay * 1000));
 };
 
+// 失败后重试任务执行
 async function retryTask(taskFn, maxRetries = 3, initialDelay = 1000) {
     let delay = initialDelay;
 
@@ -112,105 +111,7 @@ async function lotteryDraw(memberID, memberComplexCode, phone, ticketValue, inde
     }
 }
 
-
-// 【春日抽奖】
-async function springDayLottery(memberID, memberComplexCode, phone, ticketValue, index) {
-    try {
-        const validateResponse = await request('/shareCars/validateToken.action', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'Referer': `https://czyl.foton.com.cn/shareCars/activity/interactCenter250401/index.html?ftejMemberId=${memberID}&encryptedMemberId=${memberComplexCode}&channel=app`,
-                'Cookie': `FOTONTGT=${ticketValue}`
-            },
-            body: `ticketName=FOTONTGT&ticketValue=${ticketValue.trim()}`
-        });
-
-        if (!validateResponse.headers || !validateResponse.headers['set-cookie']) {
-            throw new Error(`[${index}]春日抽奖 => 获取 COOKIE 失败`);
-        }
-
-        const cookies = validateResponse.headers['set-cookie'];
-        const session = extractCookieValue(cookies.find(cookie => cookie.startsWith('SESSION=')));
-        const hwwafsesid = extractCookieValue(cookies.find(cookie => cookie.startsWith('HWWAFSESID=')));
-        const hwwafsestime = extractCookieValue(cookies.find(cookie => cookie.startsWith('HWWAFSESTIME=')));
-
-        for (let i = 1; i <= 5; i++) {
-            await randomDelay(5, 10);
-
-            const lotteryResponse = await request('/shareCars/c250401/luckyDraw.action', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json, text/javascript, */*; q=0.01',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'User-Agent': 'Mozilla/5.0 (Linux; Android 14; Mobile)',
-                    'Referer': `https://czyl.foton.com.cn/shareCars/activity/interactCenter250401/index.html?ftejMemberId=${memberID}&encryptedMemberId=${memberComplexCode}&channel=app`,
-                    'Cookie': `SESSION=${session}; FOTONTGT=${ticketValue}; HWWAFSESID=${hwwafsesid}; HWWAFSESTIME=${hwwafsestime}`
-                },
-                body: `encryptMemberId=${memberComplexCode}&activityNum=250401`
-            });
-
-            const lotteryMsg = lotteryResponse.data?.msg || '未知错误';
-            console.log(`[${index}]春日第${i}抽: ${lotteryMsg}`);
-
-            if (lotteryMsg.includes('没有抽奖次数')) {
-                console.log(`[${index}]暂无抽奖次数，跳过`);
-                break;
-            }
-        }
-    } catch (error) {
-        console.error(`[${index}]春日抽奖异常：${error.message}`);
-    }
-}
-
-
-//【春日签到】
-async function springDaySign(memberID, memberComplexCode, phone, ticketValue, index) {
-    try {
-        const validateResponse = await request('/shareCars/validateToken.action', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'Referer': `https://czyl.foton.com.cn/shareCars/activity/interactCenter250401/index.html?ftejMemberId=${memberID}&encryptedMemberId=${memberComplexCode}&channel=app`,
-                'Cookie': `FOTONTGT=${ticketValue}`
-            },
-            body: `ticketName=FOTONTGT&ticketValue=${ticketValue.trim()}`
-        });
-
-        if (!validateResponse.headers || !validateResponse.headers['set-cookie']) {
-            throw new Error(`[${index}]春日签到 => 获取 COOKIE 失败`);
-        }
-
-        const cookies = validateResponse.headers['set-cookie'];
-        const session = extractCookieValue(cookies.find(cookie => cookie.startsWith('SESSION=')));
-        const hwwafsesid = extractCookieValue(cookies.find(cookie => cookie.startsWith('HWWAFSESID=')));
-        const hwwafsestime = extractCookieValue(cookies.find(cookie => cookie.startsWith('HWWAFSESTIME=')));
-
-        await randomDelay(5, 10);
-
-        const signResponse = await request('/shareCars/c250401/sign.action', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'X-Requested-With': 'XMLHttpRequest',
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 14; Mobile)',
-                'Cookie': `SESSION=${session}; FOTONTGT=${ticketValue}; HWWAFSESID=${hwwafsesid}; HWWAFSESTIME=${hwwafsestime}`
-            },
-            body: `encryptMemberId=${memberComplexCode}`
-        });
-
-        if (signResponse.data?.code === 0) {
-            console.log(`[${index}]春日签到成功 => ${signResponse.data?.msg || ''}`);
-        } else {
-            console.log(`[${index}]春日签到失败 => ${signResponse.data?.msg || '未知错误'}`);
-        }
-
-    } catch (error) {
-        console.error(`[${index}]春日签到异常：${error.message}`);
-    }
-}
-
-
+// 提取cookie值
 function extractCookieValue(cookie) {
     return cookie ? cookie.split(';')[0].split('=')[1] : '';
 }
@@ -270,6 +171,7 @@ async function processPikaLife(phone, password, index) {
     }
 }
 
+// 获取账号名称
 async function getMemberNickname(memberComplexCode, uid, phone, index ) {
     try {
         const requestBody = {
@@ -343,6 +245,7 @@ async function corsToActivity(memberID, uid, phone, nickName, index) {
     }
 }
 
+// 保存登录友盟APP方法
 async function saveUserDeviceInfo(memberID, uid, phone, index) {
     try {
         const requestBody = {
@@ -374,6 +277,7 @@ async function saveUserDeviceInfo(memberID, uid, phone, index) {
     }
 }
 
+// 登录后进行任务执行处理
 async function processAccount(account, index) {
     try {
         let phone, password;
@@ -411,14 +315,13 @@ async function processAccount(account, index) {
 
         const { uid, memberComplexCode, memberID, memberId } = login.data;
 
-        const nickName = await getMemberNickname(memberComplexCode, uid, phone, index );
-        login.data.nickName = nickName;
+        // 账户昵称
+        // const nickName = await getMemberNickname(memberComplexCode, uid, phone, index );
+        // login.data.nickName = nickName;
+        login.data.nickName = phone; // 手机号代替
 
-        // 调用打开APP函数
-        await corsToActivity(memberID, uid, phone, nickName, index);
-
-        // 调用保存友盟设备信息函数
-        await saveUserDeviceInfo(memberID, uid, phone, index);
+        // 调用打开APP函数 未知作用
+        // await corsToActivity(memberID, uid, phone, nickName, index);
 
         // 获取任务列表
         if (FTEJ_RW === '1') {
@@ -597,24 +500,13 @@ async function processAccount(account, index) {
 
         // 调用皮卡生活签到函数
         if (FTEJ_PK === '1') {
+             // 调用保存友盟设备信息函数
+            await saveUserDeviceInfo(memberID, uid, phone, index);
+
             const pikaLifeResult = await processPikaLife(phone, password, index);
             console.log(pikaLifeResult);
         } else {
             //console.log(`[${index}]皮卡生活签到已关闭，跳过`);
-        }
-
-        // // 春日签到
-        // if (FTEJ_SpringSign === '1') {
-        // await springDaySign(memberID, memberComplexCode, phone, login.data.ticketValue, index);
-        // } else {
-        // console.log(`[${index}]春日活动已关闭，跳过`);
-        // }
-
-        // 春日抽奖
-        if (FTEJ_SpringSign === '1') {
-            await springDayLottery(memberID, memberComplexCode, phone, login.data.ticketValue, index);
-        } else {
-            //console.log(`[${index}] 春日抽奖已关闭，跳过`);
         }
 
         // 积分转盘抽奖
@@ -648,6 +540,7 @@ async function processAccount(account, index) {
     }
 }
 
+// 公共发起接口请求方法
 async function loginPost(url, body) {
     return new Promise(resolve => {
         const options = {
@@ -678,6 +571,7 @@ async function loginPost(url, body) {
     });
 }
 
+// 皮卡登录方法
 async function pkLoginPost(url, body) {
     return new Promise(resolve => {
         const options = {
@@ -707,6 +601,7 @@ async function pkLoginPost(url, body) {
     });
 }
 
+// 公共发起接口请求方法
 async function commonPost(url, body) {
     return new Promise(resolve => {
         const options = {
@@ -740,6 +635,7 @@ async function commonPost(url, body) {
     });
 }
 
+// api请求方法
 async function request(url, options) {
     return new Promise(resolve => {
         const fullUrl = `https://czyl.foton.com.cn${url}`;
@@ -771,6 +667,7 @@ async function request(url, options) {
     });
 }
 
+// 皮卡签到
 async function pkPost(url, body, token) {
     return new Promise((resolve) => {
         const options = {
@@ -801,6 +698,7 @@ async function pkPost(url, body, token) {
     });
 }
 
+// 通过文言一心获取随机文案
 async function textGet() {
     return new Promise(resolve => {
         const options = {
@@ -825,6 +723,7 @@ async function textGet() {
     });
 }
 
+// 结束后打印详细信息
 async function sendMsg(message) {
     console.log('消息通知：\n' + message)
     return
