@@ -81,8 +81,8 @@ def query_points(login: LoginResult) -> dict:
 
 # 示例调用：
 if __name__ == "__main__":
-    phone = "15839886532"
-    password = "zhao12345678"
+    phone = "18736805971"
+    password = "18736805971"
     login_result = login(phone, password)
 
     if login_result.token:
