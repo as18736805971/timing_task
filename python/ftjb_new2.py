@@ -550,6 +550,7 @@ def main():
     current_success_count = 0
     successful_phones = []  # 用于存储成功完成的手机号
     query_integral = 1 # 是否查询积分
+    query_repetition = 1 # 是否检测重复号
     update_password = 'stars123456' #修改后的密码
     # 已检测过的手机号 能登录1 跑着1 在线1 #1 0 0 #1 0 1 #1 1 1 #1 1 0
     detection_phone = [
@@ -1196,6 +1197,9 @@ def main():
         '13095340150',
         '13095345163',#26842
         '13099461537',
+        '17356581840',#腾
+        '15395010784',
+        '13126476472',
         # stars123456
     ]
 
@@ -1214,11 +1218,12 @@ def main():
             logger.info(f"获取到手机号: {phone_number}")
 
             # 检测获取到的手机号是否在detection_phone数组中
-            if phone_number in detection_phone:
-                logger.info(f"手机号 {phone_number} 已在检测列表中，跳过并重新获取")
-                yezi.free_mobile(phone_number)
-                time.sleep(3)
-                continue
+            if query_repetition == 1:
+                if phone_number in detection_phone:
+                    logger.info(f"手机号 {phone_number} 已在检测列表中，跳过并重新获取")
+                    yezi.free_mobile(phone_number)
+                    time.sleep(3)
+                    continue
 
             # 初始化验证器
             verifier = FotonVerifier(phone_number)
